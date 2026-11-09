@@ -14,9 +14,21 @@ public sealed class ObserverAtelierTests
         using ModeleCommande modele = CreerModele();
         ObservateurEspion premier = new ObservateurEspion();
         ObservateurEspion second = new ObservateurEspion();
+
         // S10-T1 : abonner les deux, ajouter Soupe × 2, puis vérifier
+
+        IDisposable abonnementPremier = modele.Subscribe(premier);
+        IDisposable abonnementSecond = modele.Subscribe(second);
+
+        modele.Ajouter(1, 2);
+
         // une notification chacun, le même objet et le total de 14,30.
-        throw new NotImplementedException("Compléter le test S10-T1.");
+
+        Assert.Single(premier.Etats);
+        Assert.Single(second.Etats);
+        Assert.Same(premier.Etats.First(), second.Etats.First());
+
+        Assert.Equal(13.00m, premier.Etats.First().Commande.Total);
     }
 
     [Fact]
@@ -27,8 +39,17 @@ public sealed class ObserverAtelierTests
         ObservateurEspion premier = new ObservateurEspion();
         ObservateurEspion second = new ObservateurEspion();
         // S10-T2 : abonner les deux, désabonner le premier deux fois,
+        IDisposable abonnementPremier = modele.Subscribe(premier);
+        IDisposable abonnementSecond = modele.Subscribe(second);
+
+        abonnementPremier.Dispose();
+        abonnementPremier.Dispose();
+
         // ajouter une ligne et vérifier que seul le second reçoit l’état.
-        throw new NotImplementedException("Compléter le test S10-T2.");
+        modele.Ajouter(1, 2);
+
+        Assert.Empty(premier.Etats);
+        Assert.Single(second.Etats);
     }
 
     private static ModeleCommande CreerModele()
